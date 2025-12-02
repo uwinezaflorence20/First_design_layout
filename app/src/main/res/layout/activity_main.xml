@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F2F5">
+    android:background="#F0F2F5"
+    tools:context=".MainActivity">
 
-    <!-- AppBar with Toolbar and SearchView -->
+    <!-- AppBar with Toolbar and SearchView. It is aligned to the top of the parent RelativeLayout. -->
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <!-- Toolbar -->
@@ -19,7 +21,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="48dp"
             android:background="#3b5998"
             app:contentInsetStartWithNavigation="0dp"
             app:navigationIcon="?attr/homeAsUpIndicator"
@@ -94,37 +96,37 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Main Content - Scrollable -->
+    <!-- Main Content - Scrollable. It is positioned below the AppBar and above the Bottom Navigation. -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_below="@id/appBarLayout"
+        android:layout_above="@+id/bottom_navigation">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="1dp">
+            android:paddingBottom="16dp">
 
             <!-- Events Today Section -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="2dp"
                 android:background="@android:color/white"
-                android:padding="10dp"
+                android:padding="20dp"
                 android:text="Events Today"
                 android:textColor="#000000"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                app:cardBackgroundColor="@android:color/white" />
+                android:textStyle="bold" />
 
             <!-- Event Card (Clickable) -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/eventCard"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -137,7 +139,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="12dp">
+                    android:padding="20dp">
 
                     <!-- Time Section -->
                     <LinearLayout
@@ -207,6 +209,19 @@
                                 android:layout_marginEnd="4dp"
                                 android:src="@android:drawable/presence_online"
                                 app:tint="#4CAF50" />
+                            <androidx.cardview.widget.CardView
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
+                                android:layout_marginEnd="4dp"
+                                app:cardCornerRadius="7dp"
+                                app:cardElevation="0dp">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:scaleType="centerCrop"
+                                    android:src="@drawable/one" />
+                            </androidx.cardview.widget.CardView>
 
                             <TextView
                                 android:layout_width="wrap_content"
@@ -224,7 +239,6 @@
             </androidx.cardview.widget.CardView>
 
             <!-- Events in San Francisco Section -->
-            <!-- One parent container for the title + the 3 cards -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -245,7 +259,7 @@
                 <!-- Row containing the 3 cards -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="200dp"
                     android:orientation="horizontal">
 
                     <!-- TODAY -->
@@ -255,13 +269,13 @@
                         android:layout_marginEnd="8dp"
                         android:layout_weight="1"
                         app:cardCornerRadius="8dp"
-                        app:cardElevation="3dp">
+                        app:cardElevation="20dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="#4267B2"
-                            android:gravity="center"
+                            android:gravity="start"
                             android:orientation="vertical"
                             android:padding="12dp">
 
@@ -274,7 +288,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="100dp"
                                 android:text="Today"
                                 android:textColor="@android:color/white"
                                 android:textSize="14sp" />
@@ -308,7 +322,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="100dp"
                                 android:text="Tomorrow"
                                 android:textColor="#000000"
                                 android:textSize="14sp" />
@@ -342,7 +356,7 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
+                                android:layout_marginTop="100dp"
                                 android:text="This Weekend"
                                 android:textColor="@android:color/white"
                                 android:textSize="14sp" />
@@ -353,88 +367,115 @@
                 </LinearLayout>
 
             </LinearLayout>
-            <!-- Popular This Weekend Section -->
-            <RelativeLayout
+
+            <!-- Popular This Weekend Section with white background -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
+                android:orientation="vertical"
+                android:background="@android:color/white"
+                android:layout_marginTop="10dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Header with title and menu -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:text="Popular This Weekend"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="8dp">
 
-                <TextView
-                    android:id="@+id/txtSeeAll"
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:text="Popular This Weekend"
+                        android:textColor="#000000"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/txtSeeAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:text="•••"
+                        android:textColor="#3b5998"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+                <!-- Popular Events Horizontal Scroll -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:text="•••"
-                    android:textColor="#3b5998"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="16dp"
+                    android:scrollbars="none">
 
-            </RelativeLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
 
-            <!-- Popular Events Horizontal Scroll -->
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:scrollbars="none">
+                        <!-- NEONSHIPS image wrapped in a CardView -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="280dp"
+                            android:layout_height="240dp"
+                            android:layout_marginEnd="8dp"
+                            app:cardBackgroundColor="@android:color/white"
+                            app:cardCornerRadius="0dp"
+                            app:cardElevation="2dp">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Popular event image 'NEONSHIPS'"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/maxresdefault"
+                                tools:src="@android:color/darker_gray" />
+                        </androidx.cardview.widget.CardView>
 
-                    <!-- NEONSHIPS image wrapped in a CardView -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="280dp"
-                        android:layout_height="240dp"
-                        android:layout_marginEnd="8dp"
-                        app:cardBackgroundColor="@android:color/white"
-                        app:cardCornerRadius="8dp">
+                        <!-- Second event image wrapped in a CardView -->
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="240dp"
+                            android:layout_height="240dp"
+                            app:cardBackgroundColor="@android:color/white"
+                            app:cardCornerRadius="0dp"
+                            app:cardElevation="2dp">
 
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="Popular event image 'NEONSHIPS'"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/maxresdefault"
-                            tools:src="@android:color/darker_gray" />
-                    </androidx.cardview.widget.CardView>
+                            <ImageView
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:contentDescription="Popular event image"
+                                android:scaleType="centerCrop"
+                                android:src="@drawable/one"
+                                tools:src="@android:color/darker_gray" />
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+                </HorizontalScrollView>
 
-                    <!-- Second event image wrapped in a CardView -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="240dp"
-                        android:layout_height="240dp"
-                        app:cardBackgroundColor="@android:color/white"
-                        app:cardCornerRadius="8dp">
-
-                        <ImageView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:contentDescription="Popular event image"
-                            android:scaleType="centerCrop"
-                            android:src="@drawable/one"
-                            tools:src="@android:color/darker_gray" />
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
-            </HorizontalScrollView>
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <!-- Bottom Navigation Bar. It is aligned to the bottom of the parent RelativeLayout. -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@android:color/white"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/bottom_nav_menu" />
+
+</RelativeLayout>

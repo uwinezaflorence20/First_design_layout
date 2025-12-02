@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="bottomNavigation" type="id" />
+    <item name="nav_feed" type="id" />
+    <item name="nav_play" type="id" />
+    <item name="nav_shop" type="id" />
+    <item name="nav_globe" type="id" />
+    <item name="nav_calendar" type="id" />
+    <item name="nav_gift" type="id" />
 </resources>
