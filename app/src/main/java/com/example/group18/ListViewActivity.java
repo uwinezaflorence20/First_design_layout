@@ -20,21 +20,17 @@ public class ListViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_view);
 
-        // Initialize views
+
         toolbar = findViewById(R.id.toolbar);
         listView = findViewById(R.id.listView);
 
-        // Setup toolbar
         setupToolbar();
-
-        // Setup ListView
         setupListView();
     }
 
     private void setupToolbar() {
         setSupportActionBar(toolbar);
 
-        // Enable back button
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -43,7 +39,6 @@ public class ListViewActivity extends AppCompatActivity {
     }
 
     private void setupListView() {
-        // Sample data for ListView
         String[] events = {
                 "Welcome Back Stacy - Lombard Palace Cafe",
                 "Tech Meetup - Silicon Valley Center",
@@ -73,17 +68,14 @@ public class ListViewActivity extends AppCompatActivity {
                 "Gaming Tournament - Metreon"
         };
 
-        // Create ArrayAdapter
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
                 events
         );
 
-        // Set adapter to ListView
         listView.setAdapter(adapter);
 
-        // Set item click listener
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
