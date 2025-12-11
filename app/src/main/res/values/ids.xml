@@ -16,4 +16,6 @@
     <item name="autoCompleteCategory" type="id" />
     <item name="radioGroupEventType" type="id" />
     <item name="btnSave" type="id" />
+    <item name="radio_public" type="id" />
+    <item name="radio_private" type="id" />
 </resources>

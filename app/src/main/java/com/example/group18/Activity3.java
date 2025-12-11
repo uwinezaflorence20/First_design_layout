@@ -56,7 +56,7 @@ public class Activity3 extends AppCompatActivity {
             new ActivityResultContracts.TakePicture(),
             isSuccess -> {
                 if (isSuccess) {
-                    eventImageView.setImageURI(imageUri);
+                    Glide.with(this).load(imageUri).into(eventImageView);
                 }
             }
     );
@@ -69,7 +69,7 @@ public class Activity3 extends AppCompatActivity {
                         try {
                             getContentResolver().takePersistableUriPermission(selectedImageUri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             imageUri = selectedImageUri;
-                            eventImageView.setImageURI(imageUri);
+                            Glide.with(this).load(imageUri).into(eventImageView);
                         } catch (SecurityException e) {
                             e.printStackTrace();
                             Toast.makeText(this, "Failed to get permission for image.", Toast.LENGTH_SHORT).show();
@@ -120,10 +120,21 @@ public class Activity3 extends AppCompatActivity {
         String location = intent.getStringExtra("EVENT_LOCATION");
         String date = intent.getStringExtra("EVENT_DATE");
         String imageUriString = intent.getStringExtra("EVENT_IMAGE_URI");
+        String category = intent.getStringExtra("EVENT_CATEGORY");
+        String type = intent.getStringExtra("EVENT_TYPE");
 
         editTextEventName.setText(title);
         editTextLocation.setText(location);
         editTextEventDate.setText(date);
+        autoCompleteCategory.setText(category, false);
+
+        if (type != null) {
+            if (type.equals("Public")) {
+                radioGroupEventType.check(R.id.radio_public);
+            } else if (type.equals("Private")) {
+                radioGroupEventType.check(R.id.radio_private);
+            }
+        }
 
         if (imageUriString != null && !imageUriString.equals("no_image_uri")) {
             imageUri = Uri.parse(imageUriString);
@@ -166,11 +177,18 @@ public class Activity3 extends AppCompatActivity {
         String location = editTextLocation.getText().toString().trim();
         String eventDate = editTextEventDate.getText().toString().trim();
         String category = autoCompleteCategory.getText().toString().trim();
-        String eventType = ((RadioButton) findViewById(radioGroupEventType.getCheckedRadioButtonId())).getText().toString();
+
+        String eventType = "";
+        int checkedRadioButtonId = radioGroupEventType.getCheckedRadioButtonId();
+        if (checkedRadioButtonId != -1) {
+            RadioButton selectedRadioButton = findViewById(checkedRadioButtonId);
+            eventType = selectedRadioButton.getText().toString();
+        }
+
         String photoUriString = (imageUri != null) ? imageUri.toString() : "no_image_uri";
 
-        if (eventName.isEmpty() || location.isEmpty() || eventDate.isEmpty() || category.isEmpty() || existingEventId == -1) {
-            Toast.makeText(this, "Error: Invalid data for update.", Toast.LENGTH_SHORT).show();
+        if (eventName.isEmpty() || location.isEmpty() || eventDate.isEmpty() || category.isEmpty() || eventType.isEmpty() || existingEventId == -1) {
+            Toast.makeText(this, "Please fill all fields, including event type.", Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -207,11 +225,18 @@ public class Activity3 extends AppCompatActivity {
         String location = editTextLocation.getText().toString().trim();
         String eventDate = editTextEventDate.getText().toString().trim();
         String category = autoCompleteCategory.getText().toString().trim();
-        String eventType = ((RadioButton) findViewById(radioGroupEventType.getCheckedRadioButtonId())).getText().toString();
+
+        String eventType = "";
+        int checkedRadioButtonId = radioGroupEventType.getCheckedRadioButtonId();
+        if (checkedRadioButtonId != -1) {
+            RadioButton selectedRadioButton = findViewById(checkedRadioButtonId);
+            eventType = selectedRadioButton.getText().toString();
+        }
+
         String photoUriString = (imageUri != null) ? imageUri.toString() : "no_image_uri";
 
-        if (eventName.isEmpty() || location.isEmpty() || eventDate.isEmpty() || category.isEmpty()) {
-            Toast.makeText(this, "Please fill all required fields.", Toast.LENGTH_SHORT).show();
+        if (eventName.isEmpty() || location.isEmpty() || eventDate.isEmpty() || category.isEmpty() || eventType.isEmpty()) {
+            Toast.makeText(this, "Please fill all required fields, including event type.", Toast.LENGTH_LONG).show();
             return;
         }
 
