@@ -21,10 +21,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:layout_marginTop="48dp"
             android:background="#3b5998"
             app:contentInsetStartWithNavigation="0dp"
-            app:navigationIcon="?attr/homeAsUpIndicator"
+            android:layout_marginTop="48dp"
             app:titleTextColor="@android:color/white">
 
             <!-- Using a RelativeLayout to position the SearchView and Button correctly -->
@@ -65,7 +64,7 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-        <!-- TabLayout with 3 tabs -->
+        <!-- TabLayout where tabs will be added programmatically -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabLayout"
             android:layout_width="match_parent"
@@ -77,20 +76,8 @@
             app:tabSelectedTextColor="#3b5998"
             app:tabTextColor="#8B8B8B">
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Events" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Calendar 2" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hosting" />
+            <!-- The TabItems have been removed from here. -->
+            <!-- They are now created in MainActivity.java to allow dynamic text updates. -->
 
         </com.google.android.material.tabs.TabLayout>
 
@@ -109,13 +96,17 @@
             android:orientation="vertical"
             android:paddingBottom="16dp">
 
-            <!-- Events Today Section -->
+            <!-- Events Today Section (UPDATED) -->
             <TextView
+                android:id="@+id/eventsTodaySection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="2dp"
                 android:background="@android:color/white"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
                 android:padding="20dp"
                 android:text="Events Today"
                 android:textColor="#000000"

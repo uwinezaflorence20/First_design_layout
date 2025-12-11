@@ -7,4 +7,13 @@
     <item name="nav_globe" type="id" />
     <item name="nav_calendar" type="id" />
     <item name="nav_gift" type="id" />
+    <item name="fragment_container" type="id" />
+    <item name="toolbar_activity3" type="id" />
+    <item name="eventImageView" type="id" />
+    <item name="editTextEventName" type="id" />
+    <item name="editTextLocation" type="id" />
+    <item name="editTextEventDate" type="id" />
+    <item name="autoCompleteCategory" type="id" />
+    <item name="radioGroupEventType" type="id" />
+    <item name="btnSave" type="id" />
 </resources>
