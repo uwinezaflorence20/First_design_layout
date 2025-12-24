@@ -31,6 +31,33 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- Category and Type Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:id="@+id/cardEventCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#3b5998"
+                    tools:text="SPORTS"/>
+
+                <TextView
+                    android:id="@+id/cardEventType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textSize="12sp"
+                    android:textColor="#888888"
+                    tools:text="Public"/>
+
+            </LinearLayout>
+
             <!-- Event Title -->
             <TextView
                 android:id="@+id/cardEventTitle"
@@ -41,14 +68,36 @@
                 android:textColor="@android:color/black"
                 tools:text="Tech Conference 2025" />
 
-            <!-- Event Date -->
-            <TextView
-                android:id="@+id/cardEventDate"
-                android:layout_width="wrap_content"
+            <!-- Date and Time Row -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="14sp"
-                tools:text="12/25/2025" />
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+
+                <!-- Event Date -->
+                <TextView
+                    android:id="@+id/cardEventDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    tools:text="12/25/2025" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" • "
+                    android:textSize="14sp"/>
+
+                <!-- Event Time -->
+                <TextView
+                    android:id="@+id/cardEventTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    tools:text="14:30" />
+            </LinearLayout>
+
 
             <!-- Event Location -->
             <TextView
@@ -61,6 +110,19 @@
                 android:gravity="center_vertical"
                 android:textSize="14sp"
                 tools:text="San Francisco, CA" />
+
+            <!-- Event Description -->
+            <TextView
+                android:id="@+id/cardEventDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="14sp"
+                android:maxLines="3"
+                android:ellipsize="end"
+                android:textColor="#555555"
+                tools:text="This is a description of the event. It can be quite long so we limit it to 3 lines..." />
+
         </LinearLayout>
 
         <!-- Divider -->

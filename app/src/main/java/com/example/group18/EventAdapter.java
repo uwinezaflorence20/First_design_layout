@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button; // <<< Import Button
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -17,9 +17,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     private final List<Event> eventList;
     private final Context context;
-    private final OnItemClickListener listener; // <<< Listener for clicks
+    private final OnItemClickListener listener;
 
-    // <<< 1. Define an interface for click events >>>
     public interface OnItemClickListener {
         void onEditClick(Event event);
         void onDeleteClick(Event event);
@@ -28,7 +27,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     public EventAdapter(Context context, List<Event> eventList, OnItemClickListener listener) {
         this.context = context;
         this.eventList = eventList;
-        this.listener = listener; // <<< Initialize listener
+        this.listener = listener;
     }
 
     @NonNull
@@ -41,7 +40,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
     @Override
     public void onBindViewHolder(@NonNull EventViewHolder holder, int position) {
         Event event = eventList.get(position);
-        holder.bind(event, listener); // Pass the event and listener to the ViewHolder
+        holder.bind(event, listener);
     }
 
     @Override
@@ -49,27 +48,34 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         return eventList.size();
     }
 
-    // <<< 2. Update ViewHolder to find buttons and set listeners >>>
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-        TextView title, date, location;
-        Button editButton, deleteButton; // <<< Find buttons
+        TextView title, date, time, description, location;
+        TextView category, type; // <<< Find new TextViews
+        Button editButton, deleteButton;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.cardEventImageView);
             title = itemView.findViewById(R.id.cardEventTitle);
             date = itemView.findViewById(R.id.cardEventDate);
+            time = itemView.findViewById(R.id.cardEventTime);
+            description = itemView.findViewById(R.id.cardEventDescription);
             location = itemView.findViewById(R.id.cardEventLocation);
+            category = itemView.findViewById(R.id.cardEventCategory); // <<< Initialize
+            type = itemView.findViewById(R.id.cardEventType);       // <<< Initialize
             editButton = itemView.findViewById(R.id.editButton);
             deleteButton = itemView.findViewById(R.id.deleteButton);
         }
 
-        // Helper method to bind data and set listeners
         public void bind(final Event event, final OnItemClickListener listener) {
             title.setText(event.getTitle());
             date.setText(event.getDate());
+            time.setText(event.getTime());
+            description.setText(event.getDescription());
             location.setText(event.getLocation());
+            category.setText(event.getCategory().toUpperCase()); // <<< Set Category
+            type.setText(event.getType());                     // <<< Set Type
 
             Glide.with(itemView.getContext())
                     .load(Uri.parse(event.getImageUri()))
@@ -77,7 +83,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                     .error(R.drawable.image_placeholder_background)
                     .into(imageView);
 
-            // Set click listeners that trigger the interface methods
             editButton.setOnClickListener(v -> listener.onEditClick(event));
             deleteButton.setOnClickListener(v -> listener.onDeleteClick(event));
         }

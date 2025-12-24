@@ -1,29 +1,36 @@
 package com.example.group18;
 
 import android.content.Intent;
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import com.example.group18.db.EventContract;
-import com.example.group18.db.EventDbHelper;
+
+import com.example.group18.api.ApiClient;
+import com.example.group18.api.ApiService;
 import com.google.android.material.tabs.TabLayout;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
-    private EventDbHelper dbHelper;
+    private ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize the database helper
-        dbHelper = new EventDbHelper(this);
+        // Initialize the API service
+        apiService = ApiClient.getClient().create(ApiService.class);
 
         // --- Find UI elements ---
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -52,39 +59,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh the event count every time the activity is shown.
-        // This ensures the count is up-to-date after you add a new event.
+        // Refresh the event count from the API every time the activity is shown
         updateEventCountInTab();
     }
 
     private void setupTabLayout() {
-        // Add tabs programmatically now that they are removed from XML
         tabLayout.addTab(tabLayout.newTab().setText("Events"));
         tabLayout.addTab(tabLayout.newTab().setText("Calendar")); // Initial text
         tabLayout.addTab(tabLayout.newTab().setText("Hosting"));
 
-        // Add a listener to know when a tab is selected.
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                // The "Calendar" tab is at position 1 (the second tab).
                 if (tab.getPosition() == 1) {
-                    // Open the ListViewActivity to show all events from the database.
                     Intent intent = new Intent(MainActivity.this, ListViewActivity.class);
+                    startActivity(intent);
+                } else if (tab.getPosition() == 2) { // <<< Handle Hosting tab click
+                    Intent intent = new Intent(MainActivity.this, HostingActivity.class);
                     startActivity(intent);
                 }
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                // Not needed for this functionality
-            }
+            public void onTabUnselected(TabLayout.Tab tab) {}
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                // Also open the list if the user re-clicks the tab.
                 if (tab.getPosition() == 1) {
                     Intent intent = new Intent(MainActivity.this, ListViewActivity.class);
+                    startActivity(intent);
+                } else if (tab.getPosition() == 2) { // <<< Also handle re-selection
+                    Intent intent = new Intent(MainActivity.this, HostingActivity.class);
                     startActivity(intent);
                 }
             }
@@ -92,18 +97,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Queries the database to get the total number of events and updates the "Calendar" tab's text.
+     * Fetches event data from the API and updates the "Calendar" tab with the total count.
      */
     private void updateEventCountInTab() {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        // Use the built-in DatabaseUtils to efficiently get the count of entries in the events table.
-        long eventCount = DatabaseUtils.queryNumEntries(db, EventContract.EventEntry.TABLE_NAME);
+        Call<List<Event>> call = apiService.getAllEvents();
+        call.enqueue(new Callback<List<Event>>() {
+            @Override
+            public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    int eventCount = response.body().size();
+                    TabLayout.Tab calendarTab = tabLayout.getTabAt(1);
+                    if (calendarTab != null) {
+                        calendarTab.setText("Calendar (" + eventCount + ")");
+                    }
+                } else {
+                    // If it fails, just show the plain text
+                    TabLayout.Tab calendarTab = tabLayout.getTabAt(1);
+                    if (calendarTab != null) {
+                        calendarTab.setText("Calendar");
+                    }
+                }
+            }
 
-        // Get the specific tab we want to update (the "Calendar" tab at position 1).
-        TabLayout.Tab calendarTab = tabLayout.getTabAt(1);
-        if (calendarTab != null) {
-            // Update the text to show the count.
-            calendarTab.setText("Calendar (" + eventCount + ")");
-        }
+            @Override
+            public void onFailure(Call<List<Event>> call, Throwable t) {
+                // On network failure, also revert to plain text
+                TabLayout.Tab calendarTab = tabLayout.getTabAt(1);
+                if (calendarTab != null) {
+                    calendarTab.setText("Calendar");
+                }
+                Toast.makeText(MainActivity.this, "Failed to get event count.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

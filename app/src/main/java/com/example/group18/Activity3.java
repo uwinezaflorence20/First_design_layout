@@ -2,11 +2,11 @@ package com.example.group18;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.ContentValues;
+import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -24,8 +24,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
-import com.example.group18.db.EventContract;
-import com.example.group18.db.EventDbHelper;
+import com.example.group18.api.ApiClient;
+import com.example.group18.api.ApiService;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,17 +34,22 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class Activity3 extends AppCompatActivity {
 
     // UI View variables
     private EditText editTextEventName, editTextLocation, editTextEventDate;
+    private EditText editTextEventTime, editTextEventDescription;
     private AutoCompleteTextView autoCompleteCategory;
     private RadioGroup radioGroupEventType;
     private ImageView eventImageView;
     private Button btnSave;
 
-    // Database and Image URI variables
-    private EventDbHelper dbHelper;
+    // API Service and Image URI variables
+    private ApiService apiService;
     private Uri imageUri;
 
     // --- NEW: Variables to manage edit mode ---
@@ -84,7 +89,9 @@ public class Activity3 extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_3);
 
-        dbHelper = new EventDbHelper(this);
+        // Initialize API Service
+        apiService = ApiClient.getClient().create(ApiService.class);
+        
         initializeViewsAndListeners();
 
         // Check if we are in CREATE or EDIT mode
@@ -119,6 +126,8 @@ public class Activity3 extends AppCompatActivity {
         String title = intent.getStringExtra("EVENT_TITLE");
         String location = intent.getStringExtra("EVENT_LOCATION");
         String date = intent.getStringExtra("EVENT_DATE");
+        String time = intent.getStringExtra("EVENT_TIME");
+        String description = intent.getStringExtra("EVENT_DESCRIPTION");
         String imageUriString = intent.getStringExtra("EVENT_IMAGE_URI");
         String category = intent.getStringExtra("EVENT_CATEGORY");
         String type = intent.getStringExtra("EVENT_TYPE");
@@ -126,6 +135,8 @@ public class Activity3 extends AppCompatActivity {
         editTextEventName.setText(title);
         editTextLocation.setText(location);
         editTextEventDate.setText(date);
+        editTextEventTime.setText(time);
+        editTextEventDescription.setText(description);
         autoCompleteCategory.setText(category, false);
 
         if (type != null) {
@@ -149,6 +160,8 @@ public class Activity3 extends AppCompatActivity {
         editTextEventName = findViewById(R.id.editTextEventName);
         editTextLocation = findViewById(R.id.editTextLocation);
         editTextEventDate = findViewById(R.id.editTextEventDate);
+        editTextEventTime = findViewById(R.id.editTextEventTime);
+        editTextEventDescription = findViewById(R.id.editTextEventDescription);
         autoCompleteCategory = findViewById(R.id.autoCompleteCategory);
         radioGroupEventType = findViewById(R.id.radioGroupEventType);
         btnSave = findViewById(R.id.btnSave);
@@ -159,6 +172,7 @@ public class Activity3 extends AppCompatActivity {
 
         eventImageView.setOnClickListener(v -> showImageSourceDialog());
         editTextEventDate.setOnClickListener(v -> showDatePickerDialog());
+        editTextEventTime.setOnClickListener(v -> showTimePickerDialog());
         btnSave.setOnClickListener(v -> saveOrUpdateEvent());
     }
 
@@ -171,11 +185,13 @@ public class Activity3 extends AppCompatActivity {
         }
     }
 
-    // New method specifically for updating an existing event
+    // New method specifically for updating an existing event via API
     private void updateExistingEvent() {
         String eventName = editTextEventName.getText().toString().trim();
         String location = editTextLocation.getText().toString().trim();
         String eventDate = editTextEventDate.getText().toString().trim();
+        String eventTime = editTextEventTime.getText().toString().trim();
+        String description = editTextEventDescription.getText().toString().trim();
         String category = autoCompleteCategory.getText().toString().trim();
 
         String eventType = "";
@@ -192,38 +208,38 @@ public class Activity3 extends AppCompatActivity {
             return;
         }
 
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(EventContract.EventEntry.COLUMN_NAME_TITLE, eventName);
-        values.put(EventContract.EventEntry.COLUMN_NAME_LOCATION, location);
-        values.put(EventContract.EventEntry.COLUMN_NAME_DATE, eventDate);
-        values.put(EventContract.EventEntry.COLUMN_NAME_CATEGORY, category);
-        values.put(EventContract.EventEntry.COLUMN_NAME_TYPE, eventType);
-        values.put(EventContract.EventEntry.COLUMN_NAME_IMAGE_URI, photoUriString);
+        // <<< FIX: Construct date in YYYY-MM-DD for API >>>
+        // Note: This relies on the date picker setting the date as YYYY-MM-DD
+        Event event = new Event(existingEventId, eventName, eventDate, eventTime, description, location, photoUriString, category, eventType);
+        
+        Call<Event> call = apiService.updateEvent(existingEventId, event);
+        call.enqueue(new Callback<Event>() {
+            @Override
+            public void onResponse(Call<Event> call, Response<Event> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(Activity3.this, "Event updated successfully!", Toast.LENGTH_SHORT).show();
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                } else {
+                    Toast.makeText(Activity3.this, "Error updating event on server.", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        String selection = EventContract.EventEntry._ID + " = ?";
-        String[] selectionArgs = {String.valueOf(existingEventId)};
-
-        int count = db.update(
-                EventContract.EventEntry.TABLE_NAME,
-                values,
-                selection,
-                selectionArgs);
-
-        if (count > 0) {
-            Toast.makeText(this, "Event updated successfully!", Toast.LENGTH_SHORT).show();
-            setResult(Activity.RESULT_OK);
-            finish();
-        } else {
-            Toast.makeText(this, "Error updating event.", Toast.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onFailure(Call<Event> call, Throwable t) {
+                Toast.makeText(Activity3.this, "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("API_ERROR", t.getMessage());
+            }
+        });
     }
 
-    // The original save logic, now in its own method
+    // New method for creating an event via API
     private void createNewEvent() {
         String eventName = editTextEventName.getText().toString().trim();
         String location = editTextLocation.getText().toString().trim();
         String eventDate = editTextEventDate.getText().toString().trim();
+        String eventTime = editTextEventTime.getText().toString().trim();
+        String description = editTextEventDescription.getText().toString().trim();
         String category = autoCompleteCategory.getText().toString().trim();
 
         String eventType = "";
@@ -240,34 +256,28 @@ public class Activity3 extends AppCompatActivity {
             return;
         }
 
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        // We pass 0 for ID since the server will generate it
+        Event newEvent = new Event(0, eventName, eventDate, eventTime, description, location, photoUriString, category, eventType);
 
-        ContentValues organizerValues = new ContentValues();
-        organizerValues.put(EventContract.OrganizerEntry.COLUMN_NAME_ORGANIZER_NAME, "My Events");
-        long organizerId = db.insertWithOnConflict(EventContract.OrganizerEntry.TABLE_NAME, null, organizerValues, SQLiteDatabase.CONFLICT_IGNORE);
-        if (organizerId == -1) {
-            // If conflict, find the ID of the existing organizer
-            // (A more robust implementation would be needed for multiple organizers)
-        }
+        Call<Event> call = apiService.createEvent(newEvent);
+        call.enqueue(new Callback<Event>() {
+            @Override
+            public void onResponse(Call<Event> call, Response<Event> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(Activity3.this, "Event Saved Successfully!", Toast.LENGTH_SHORT).show();
+                    setResult(Activity.RESULT_OK);
+                    finish();
+                } else {
+                    Toast.makeText(Activity3.this, "Error saving event to server.", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-        ContentValues eventValues = new ContentValues();
-        eventValues.put(EventContract.EventEntry.COLUMN_NAME_TITLE, eventName);
-        eventValues.put(EventContract.EventEntry.COLUMN_NAME_LOCATION, location);
-        eventValues.put(EventContract.EventEntry.COLUMN_NAME_DATE, eventDate);
-        eventValues.put(EventContract.EventEntry.COLUMN_NAME_CATEGORY, category);
-        eventValues.put(EventContract.EventEntry.COLUMN_NAME_TYPE, eventType);
-        eventValues.put(EventContract.EventEntry.COLUMN_NAME_IMAGE_URI, photoUriString);
-        eventValues.put(EventContract.EventEntry.COLUMN_NAME_ORGANIZER_ID, organizerId);
-
-        long newRowId = db.insert(EventContract.EventEntry.TABLE_NAME, null, eventValues);
-
-        if (newRowId != -1) {
-            Toast.makeText(this, "Event Saved Successfully!", Toast.LENGTH_SHORT).show();
-            setResult(Activity.RESULT_OK);
-            finish();
-        } else {
-            Toast.makeText(this, "Error saving event.", Toast.LENGTH_SHORT).show();
-        }
+            @Override
+            public void onFailure(Call<Event> call, Throwable t) {
+                Toast.makeText(Activity3.this, "Network Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("API_ERROR", t.getMessage());
+            }
+        });
     }
 
     // Methods for image and date pickers
@@ -319,14 +329,30 @@ public class Activity3 extends AppCompatActivity {
         return File.createTempFile(imageFileName, ".jpg", storageDir);
     }
 
+    // <<< UPDATED: Date picker format to YYYY-MM-DD for backend compatibility >>>
     private void showDatePickerDialog() {
         final Calendar c = Calendar.getInstance();
         new DatePickerDialog(this,
                 (view, year, month, day) -> {
-                    String selectedDate = (month + 1) + "/" + day + "/" + year;
+                    // Format: YYYY-MM-DD
+                    // Note: month is 0-indexed, so we add 1
+                    String selectedDate = String.format(Locale.US, "%d-%02d-%02d", year, month + 1, day);
                     editTextEventDate.setText(selectedDate);
                 }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))
                 .show();
+    }
+
+    // New Method for Time Picker
+    private void showTimePickerDialog() {
+        final Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
+
+        new TimePickerDialog(this,
+                (view, selectedHour, selectedMinute) -> {
+                    String time = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
+                    editTextEventTime.setText(time);
+                }, hour, minute, true).show();
     }
 
     @Override

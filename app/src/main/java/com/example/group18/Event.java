@@ -1,31 +1,55 @@
 package com.example.group18;
 
-public class Event {
-    private final long id;
-    private final String title;
-    private final String date;
-    private final String location;
-    private final String imageUri;
-    private final String category; // Field for category
-    private final String type;     // Field for type
+import com.google.gson.annotations.SerializedName;
 
-    // --- THIS IS THE CORRECT CONSTRUCTOR THAT ACCEPTS 7 ARGUMENTS ---
-    public Event(long id, String title, String date, String location, String imageUri, String category, String type) {
+public class Event {
+    
+    private final long id;
+
+    @SerializedName("eventName")
+    private final String title;
+
+    @SerializedName("eventDate")
+    private final String date;
+
+    @SerializedName("eventTime")
+    private final String time;
+
+    private final String description; // Matches backend name
+
+    private final String location;    // Matches backend name
+
+    @SerializedName("imageUrl")
+    private final String imageUri;
+
+    // Backend 'eventType' seems to correspond to your "Tech/Music" dropdown (Android 'category')
+    @SerializedName("eventType")
+    private final String category;
+
+    // Backend 'category' seems to correspond to your "Public/Private" radio button (Android 'type')
+    @SerializedName("category")
+    private final String type;
+
+    public Event(long id, String title, String date, String time, String description, String location, String imageUri, String category, String type) {
         this.id = id;
         this.title = title;
         this.date = date;
+        this.time = time;
+        this.description = description;
         this.location = location;
         this.imageUri = imageUri;
-        this.category = category; // Initialize category
-        this.type = type;         // Initialize type
+        this.category = category;
+        this.type = type;
     }
 
-    // Getters for all fields
+    // Getters
     public long getId() { return id; }
     public String getTitle() { return title; }
     public String getDate() { return date; }
+    public String getTime() { return time; }
+    public String getDescription() { return description; }
     public String getLocation() { return location; }
     public String getImageUri() { return imageUri; }
-    public String getCategory() { return category; } // Getter for category
-    public String getType() { return type; }         // Getter for type
+    public String getCategory() { return category; }
+    public String getType() { return type; }
 }

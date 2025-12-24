@@ -2,18 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.group18">
 
-    <!-- 1. PERMISSION to use the internet (for Glide image loading) -->
+    <!-- <<< Add Internet Permission >>> -->
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- 2. PERMISSION and FEATURE declaration for the Camera -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
-
-    <!-- 3. PERMISSIONS for reading from the gallery (you already have these) -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission
-        android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +11,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"> <!-- <<< Allow HTTP Traffic -->
 
         <!-- Main Activity - This is the launcher activity (first screen) -->
         <activity
@@ -38,18 +29,18 @@
             android:name=".ListViewActivity"
             android:parentActivityName=".MainActivity"
             android:exported="false" />
-        <activity android:name=".Activity3" />
 
-        <!-- 4. PROVIDER for securely sharing file paths with the camera app -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.group18.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
+        <!-- Hosting Activity - New activity for the hosting tab -->
+        <activity
+            android:name=".HostingActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
+
+        <!-- Activity3 for Creating/Editing Events -->
+        <activity
+            android:name=".Activity3"
+            android:parentActivityName=".ListViewActivity"
+            android:exported="false" />
 
     </application>
 
